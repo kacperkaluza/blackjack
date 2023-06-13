@@ -1,33 +1,57 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./App.css";
 
 function App() {
-    const [dealerDeck, setDealerDeck] = useState([]);
-    const [playerDeck, setPlayerDeck] = useState([]);
-    const [info, setInfo] = useState(" ");
+    const [dealer, setDealer] = useState({ deck: [], points: 0 });
+    const [player, setPlayer] = useState({ deck: [], points: 0 });
+    const [gameStatus, setGameStatus] = useState(" ");
+    const cards = {
+        values: [
+            "ace",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "jack",
+            "queen",
+            "king",
+        ],
+        symbols: ["clubs", "diamonds", "hearts", "spades"],
+    };
 
     function getDeckScore(deck) {
         return deck.reduce((total, amount) => total + amount);
     }
 
-    if (info == "") {
-        var dealerDeckScore = getDeckScore(dealerDeck);
-        var playerDeckScore = getDeckScore(playerDeck);
+    if (gameStatus == "onGoing") {
+        dealer.points = getDeckScore(dealer.deck);
+        player.points = getDeckScore(player.deck);
 
-        if (playerDeckScore == dealerDeckScore) {
-            setInfo("push");
+        if (player.points == dealer.points) {
+            setGameStatus("push");
         } else if (
-            (playerDeckScore == 21 || playerDeckScore > dealerDeckScore) &&
-            playerDeckScore <= 21
+            (player.points == 21 || player.points > dealer.points) &&
+            player.points <= 21
         ) {
-            setInfo("win");
-        } else if (playerDeckScore > 21) {
-            setInfo("bust");
+            setGameStatus("win");
+        } else if (player.points > 21) {
+            setGameStatus("bust");
         }
     }
 
+    function getRandomNumber(max) {
+        return Math.floor(Math.random() * max);
+    }
+
     function getRandomCard() {
-        return Math.floor(Math.random() * 14 + 2);
+        return `${cards.values[getRandomNumber(cards.values.length)]}_of_${
+            cards.symbols[getRandomNumber(cards.symbols.length)]
+        }`;
     }
 
     function getRandomDeck() {
@@ -35,25 +59,36 @@ function App() {
     }
 
     function startNewGame() {
-        if (info == "") {
-            setPlayerDeck([...playerDeck, getRandomCard()]);
+        if (gameStatus == "onGoing") {
+            setPlayer((prevPlayer) => ({
+                ...prevPlayer,
+                deck: [...prevPlayer.deck, getRandomCard()],
+            }));
         } else {
-            
-            setDealerDeck(getRandomDeck());
-            setPlayerDeck(getRandomDeck());
-            if
-            setInfo("");
+            setDealer((prevDealer) => ({
+                ...prevDealer,
+                deck: getRandomDeck(),
+            }));
+            setPlayer((prevPlayer) => ({
+                ...prevPlayer,
+                deck: getRandomDeck(),
+            }));
+            setGameStatus("onGoing");
         }
     }
-
+    console.log(dealer);
     function DisplayCards() {
-        const dealerCardsElem = dealerDeck.map((card) => `${card} `);
-        const playerCardsElem = playerDeck.map((card) => `${card} `);
+        const dealerCardsElem = dealer.deck.map((card, key) => (
+            <img src={`cards/${card}.png`} key={key} />
+        ));
+        const playerCardsElem = player.deck.map((card, key) => (
+            <img src={`cards/${card}.png`} key={key} />
+        ));
         return (
             <>
-                <h2>Dealer's Cards</h2>
+                <h2>Dealer&apos;s Cards </h2>
                 <h3>{dealerCardsElem}</h3>
-                <h2>Player's Cards</h2>
+                <h2>Player&apos;s Cards </h2>
                 <h3>{playerCardsElem}</h3>
             </>
         );
@@ -61,12 +96,11 @@ function App() {
 
     return (
         <>
+            {gameStatus == " " ? "" : <DisplayCards />}
+            <h4>{gameStatus == "onGoing" ? "" : gameStatus}</h4>
             <button onClick={startNewGame}>
-                {info ? "Start New Game" : "Take"}
+                {gameStatus == " " ? "Start New Game" : "Deal"}
             </button>
-
-            <DisplayCards />
-            <h4>{info}</h4>
         </>
     );
 }
