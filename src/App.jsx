@@ -23,9 +23,38 @@ function App() {
         ],
         symbols: ["clubs", "diamonds", "hearts", "spades"],
     };
+    
+    function getRandomNumber(max) {
+        return Math.floor(Math.random() * max);
+    }
+
+    function getRandomCard() {
+        return `${cards.values[getRandomNumber(cards.values.length)]}_of_${
+            cards.symbols[getRandomNumber(cards.symbols.length)]
+        }`;
+    }
+
+    function getRandomDeck() {
+        return [getRandomCard(), getRandomCard()];
+    }
 
     function getDeckScore(deck) {
-        return deck.reduce((total, amount) => total + amount);
+        const cardValues = {
+            jack: 10,
+            queen: 10,
+            king: 10,
+            ace: 11,
+        };
+        let totalPoints = 0;
+
+        for (let i = 0; i < deck.length; i++) {
+            const card = deck[i];
+            const valueString = card.split("_")[0];
+            const value = cardValues[valueString] || parseInt(valueString);
+            totalPoints += value;
+        }
+
+        return totalPoints;
     }
 
     if (gameStatus == "onGoing") {
@@ -44,21 +73,9 @@ function App() {
         }
     }
 
-    function getRandomNumber(max) {
-        return Math.floor(Math.random() * max);
-    }
+    
 
-    function getRandomCard() {
-        return `${cards.values[getRandomNumber(cards.values.length)]}_of_${
-            cards.symbols[getRandomNumber(cards.symbols.length)]
-        }`;
-    }
-
-    function getRandomDeck() {
-        return [getRandomCard(), getRandomCard()];
-    }
-
-    function startNewGame() {
+    function handleClick() {
         if (gameStatus == "onGoing") {
             setPlayer((prevPlayer) => ({
                 ...prevPlayer,
@@ -76,7 +93,7 @@ function App() {
             setGameStatus("onGoing");
         }
     }
-    console.log(dealer);
+
     function DisplayCards() {
         const dealerCardsElem = dealer.deck.map((card, key) => (
             <img src={`cards/${card}.png`} key={key} />
@@ -86,9 +103,9 @@ function App() {
         ));
         return (
             <>
-                <h2>Dealer&apos;s Cards </h2>
+                <h2>Dealer&apos;s Cards {dealer.points}</h2>
                 <h3>{dealerCardsElem}</h3>
-                <h2>Player&apos;s Cards </h2>
+                <h2>Player&apos;s Cards {player.points} </h2>
                 <h3>{playerCardsElem}</h3>
             </>
         );
@@ -98,7 +115,7 @@ function App() {
         <>
             {gameStatus == " " ? "" : <DisplayCards />}
             <h4>{gameStatus == "onGoing" ? "" : gameStatus}</h4>
-            <button onClick={startNewGame}>
+            <button onClick={handleClick}>
                 {gameStatus == " " ? "Start New Game" : "Deal"}
             </button>
         </>
