@@ -50,7 +50,15 @@ function App() {
         for (let i = 0; i < deck.length; i++) {
             const card = deck[i];
             const valueString = card.split("_")[0];
-            const value = cardValues[valueString] || parseInt(valueString);
+            let value = cardValues[valueString] || parseInt(valueString);
+
+            if (
+                valueString == "ace" &&
+                (player.points > 12 || dealer.points > 12)
+            ) {
+                value = 1;
+            }
+
             totalPoints += value;
         }
 
@@ -108,7 +116,7 @@ function App() {
             </>
         );
     }
-
+    console.log(dealer)
     return (
         <>
             {gameStatus == " " ? "" : <DisplayCards />}
