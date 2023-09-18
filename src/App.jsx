@@ -23,7 +23,7 @@ function App() {
         ],
         symbols: ["clubs", "diamonds", "hearts", "spades"],
     };
-    
+
     function getRandomNumber(max) {
         return Math.floor(Math.random() * max);
     }
@@ -72,8 +72,6 @@ function App() {
             setGameStatus("bust");
         }
     }
-
-    
 
     function handleClick() {
         if (gameStatus == "onGoing") {
