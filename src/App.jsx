@@ -4,7 +4,7 @@ import "./App.css";
 function App() {
     const [dealer, setDealer] = useState({ deck: [], points: 0 });
     const [player, setPlayer] = useState({ deck: [], points: 0 });
-    const [gameStatus, setGameStatus] = useState(" ");
+    const [gameStatus, setGameStatus] = useState("NaN");
     const cards = {
         values: [
             "ace",
@@ -24,21 +24,21 @@ function App() {
         symbols: ["clubs", "diamonds", "hearts", "spades"],
     };
 
-    function getRandomNumber(max) {
+    const getRandomNumber = (max) => {
         return Math.floor(Math.random() * max);
-    }
+    };
 
-    function getRandomCard() {
+    const getRandomCard = () => {
         return `${cards.values[getRandomNumber(cards.values.length)]}_of_${
             cards.symbols[getRandomNumber(cards.symbols.length)]
         }`;
-    }
+    };
 
-    function getRandomDeck() {
+    const getRandomDeck = () => {
         return [getRandomCard(), getRandomCard()];
-    }
+    };
 
-    function getDeckScore(deck) {
+    const getDeckScore = (instance) => {
         const cardValues = {
             jack: 10,
             queen: 10,
@@ -47,15 +47,12 @@ function App() {
         };
         let totalPoints = 0;
 
-        for (let i = 0; i < deck.length; i++) {
-            const card = deck[i];
+        for (let i = 0; i < instance.deck.length; i++) {
+            const card = instance.deck[i];
             const valueString = card.split("_")[0];
             let value = cardValues[valueString] || parseInt(valueString);
 
-            if (
-                valueString == "ace" &&
-                (player.points > 12 || dealer.points > 12)
-            ) {
+            if (valueString == "ace" && instance.points > 12) {
                 value = 1;
             }
 
@@ -63,40 +60,48 @@ function App() {
         }
 
         return totalPoints;
-    }
+    };
 
-    if (gameStatus == "onGoing") {
-        dealer.points = getDeckScore(dealer.deck);
-        player.points = getDeckScore(player.deck);
-
-        if (player.points == dealer.points) {
-            setGameStatus("push");
-        } else if (
-            (player.points == 21 || player.points > dealer.points) &&
-            player.points <= 21
-        ) {
-            setGameStatus("win");
-        } else if (player.points > 21) {
-            setGameStatus("bust");
-        }
-    }
-
-    function handleClick() {
-        if (gameStatus == "onGoing") {
-            setPlayer((prevPlayer) => ({
-                ...prevPlayer,
-                deck: [...prevPlayer.deck, getRandomCard()],
-            }));
-        } else {
+    const handleClick = (e) => {
+        if (e.target.name == "start") {
             setDealer((prevDealer) => ({
                 ...prevDealer,
-                deck: getRandomDeck(),
+                deck: [getRandomCard()],
             }));
             setPlayer((prevPlayer) => ({
                 ...prevPlayer,
                 deck: getRandomDeck(),
             }));
             setGameStatus("onGoing");
+        }
+
+        if (e.target.name == "deal") {
+            setPlayer((prevPlayer) => ({
+                ...prevPlayer,
+                deck: [...prevPlayer.deck, getRandomCard()],
+            }));
+            player.points = getDeckScore(player);
+            if (player.points > 21) {
+                setGameStatus("bust");
+            }
+        }
+
+        if (e.target.name == "fold") {
+            setGameStatus("fold");
+        }
+    };
+
+    if (gameStatus == "fold") {
+        setDealer((prevDealer) => ({
+            ...prevDealer,
+            deck: [...prevDealer.deck, getRandomCard()],
+        }));
+        dealer.points = getDeckScore(dealer);
+        if (player.points == dealer.points) {
+            setGameStatus("push");
+        }
+        if (player.points == 21) {
+            setGameStatus("blackjack");
         }
     }
 
@@ -109,21 +114,26 @@ function App() {
         ));
         return (
             <>
-                <h2>Dealer&apos;s Cards {dealer.points}</h2>
+                <h2>Dealer&apos;s Cards {player.points}</h2>
                 <h3>{dealerCardsElem}</h3>
                 <h2>Player&apos;s Cards {player.points} </h2>
                 <h3>{playerCardsElem}</h3>
             </>
         );
     }
-    console.log(dealer)
     return (
         <>
-            {gameStatus == " " ? "" : <DisplayCards />}
-            <h4>{gameStatus == "onGoing" ? "" : gameStatus}</h4>
-            <button onClick={handleClick}>
-                {gameStatus == " " ? "Start New Game" : "Deal"}
+            <DisplayCards />
+            <button onClick={handleClick} name='start'>
+                Start Game
             </button>
+            <button onClick={handleClick} name='deal'>
+                Deal
+            </button>
+            <button onClick={handleClick} name='fold'>
+                Fold
+            </button>
+            <h2>{gameStatus}</h2>
         </>
     );
 }
