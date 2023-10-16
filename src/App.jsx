@@ -38,6 +38,33 @@ function App() {
         return [getRandomCard(), getRandomCard()];
     };
 
+    const compareHands = (a, b) => {
+        if (a > 21) {
+            setGameStatus("win");
+        }
+        if (b == a) {
+            setGameStatus("push");
+        }
+        if (b > a) {
+            setGameStatus("win");
+        }
+        if (b < a) {
+            setGameStatus("lose");
+        }
+    };
+
+    const getTemp = (tempObj) => {
+        tempObj = {
+            ...tempObj,
+            hand: [...tempObj.hand, getRandomCard()],
+        };
+        tempObj = {
+            ...tempObj,
+            points: getHandScore(tempObj),
+        };
+        return tempObj;
+    };
+
     const getHandScore = (instance) => {
         const cardValues = {
             jack: 10,
@@ -52,7 +79,7 @@ function App() {
             const valueString = card.split("_")[0];
             let value = cardValues[valueString] || parseInt(valueString);
 
-            if (valueString == "ace" && instance.points > 12) {
+            if (valueString == "ace" && instance.points < 12) {
                 value = 1;
             }
 
@@ -64,93 +91,66 @@ function App() {
 
     const handleClick = (e) => {
         if (e.target.name == "start") {
-            setDealer((prevDealer) => ({
-                ...prevDealer,
+            let tempPlayer = {
                 hand: getRandomHand(),
-            }));
-            setDealer((prevDealer) => ({
-                ...prevDealer,
-                points: getHandScore(prevDealer),
-            }));
-            setPlayer((prevPlayer) => ({
-                ...prevPlayer,
-                hand: getRandomHand(),
-            }));
-            setPlayer((prevPlayer) => ({
-                ...prevPlayer,
-                points: getHandScore(prevPlayer),
-            }));
-            setGameStatus("onGoing");
-        }
-
-        if (e.target.name == "deal") {
-            let tempPlayer = player;
-            tempPlayer = {
-                ...tempPlayer,
-                hand: [...tempPlayer.hand, getRandomCard()],
+                points: 0,
             };
             tempPlayer = {
                 ...tempPlayer,
                 points: getHandScore(tempPlayer),
             };
             setPlayer(tempPlayer);
+            console.log(tempPlayer);
+            let tempDealer = {
+                hand: getRandomHand(),
+                points: 0,
+            };
+            tempDealer = {
+                ...tempDealer,
+                points: getHandScore(tempDealer),
+            };
+            setDealer(tempDealer);
+            console.log(tempDealer);
+            let tempGameStatus = "";
+            if (tempPlayer.points == 21) {
+                tempGameStatus = "blackjack";
+            }
+            if (tempPlayer.points < 21) {
+                if (tempDealer.points == "21") {
+                    tempGameStatus = "lose";
+                } else {
+                    tempGameStatus = "onGoing";
+                }
+            }
+            setGameStatus(tempGameStatus);
+        }
 
+        if (e.target.name == "deal") {
+            let tempPlayer = player;
+            tempPlayer = getTemp(tempPlayer);
+            setPlayer(tempPlayer);
             if (tempPlayer.points > 21) {
                 setGameStatus("bust");
             }
             if (tempPlayer.points == 21) {
                 let tempDealer = dealer;
                 while (tempDealer.points < 17) {
-                    tempDealer = {
-                        ...tempDealer,
-                        hand: [...tempDealer.hand, getRandomCard()],
-                    };
-                    tempDealer = {
-                        ...tempDealer,
-                        points: getHandScore(tempDealer),
-                    };
+                    tempDealer = getTemp(tempDealer);
                 }
                 setDealer(tempDealer);
-                if (tempDealer.points > 21) {
-                    setGameStatus("win");
-                }
-                if (tempPlayer.points == tempDealer.points) {
-                    setGameStatus("push");
-                }
-                if (tempPlayer.points > tempDealer.points) {
-                    setGameStatus("win");
-                }
-                if (tempPlayer.points < tempDealer.points) {
-                    setGameStatus("lose");
-                }
+                compareHands(tempDealer.points, tempPlayer.points);
             }
         }
 
         if (e.target.name == "fold") {
+            console.log(dealer);
+            console.log(player);
             let tempDealer = dealer;
             while (tempDealer.points < 17) {
-                tempDealer = {
-                    ...tempDealer,
-                    hand: [...tempDealer.hand, getRandomCard()],
-                };
-                tempDealer = {
-                    ...tempDealer,
-                    points: getHandScore(tempDealer),
-                };
+                tempDealer = getTemp(tempDealer);
             }
             setDealer(tempDealer);
-            if (tempDealer.points > 21) {
-                setGameStatus("win");
-            }
-            if (player.points == tempDealer.points) {
-                setGameStatus("push");
-            }
-            if (player.points > tempDealer.points) {
-                setGameStatus("win");
-            }
-            if (player.points < tempDealer.points) {
-                setGameStatus("lose");
-            }
+            compareHands(tempDealer.points, player.points);
         }
     };
 
