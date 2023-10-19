@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 
 function App() {
     const [dealer, setDealer] = useState({ hand: [], points: 0 });
     const [player, setPlayer] = useState({ hand: [], points: 0 });
     const [gameStatus, setGameStatus] = useState("NaN");
+    const [deck, setDeck] = useState([]);
+
     const cards = {
         values: [
             "ace",
@@ -24,18 +26,42 @@ function App() {
         symbols: ["clubs", "diamonds", "hearts", "spades"],
     };
 
+    const getDeck = () => {
+        return cards.values
+            .map((value) =>
+                cards.symbols.map((symbol) => `${value}_of_${symbol}`)
+            )
+            .flat();
+    };
+
+    const shuffleDeck = (d) => {
+        let j, x;
+        for (let i = d.length - 1; i > 0; i--) {
+            j = getRandomNumber(i + 1);
+            x = d[i];
+            d[i] = d[j];
+            d[j] = x;
+        }
+        return d;
+    };
+    useEffect(() => {
+        setDeck(shuffleDeck(getDeck()));
+    }, []);
+    console.log(deck);
     const getRandomNumber = (max) => {
         return Math.floor(Math.random() * max);
     };
 
-    const getRandomCard = () => {
-        return `${cards.values[getRandomNumber(cards.values.length)]}_of_${
-            cards.symbols[getRandomNumber(cards.symbols.length)]
-        }`;
+    const getCard = () => {
+        const card = [...deck].pop();
+        setDeck(deck.filter((c) => c !== card));
+        return card;
     };
 
     const getRandomHand = () => {
-        return [getRandomCard(), getRandomCard()];
+        const cards = deck.slice(-2);
+        setDeck((prev) => prev.slice(0, -2));
+        return cards;
     };
 
     const compareHands = (a, b) => {
@@ -56,7 +82,7 @@ function App() {
     const getTemp = (tempObj) => {
         tempObj = {
             ...tempObj,
-            hand: [...tempObj.hand, getRandomCard()],
+            hand: [...tempObj.hand, getCard()],
         };
         tempObj = {
             ...tempObj,
@@ -79,7 +105,7 @@ function App() {
             const valueString = card.split("_")[0];
             let value = cardValues[valueString] || parseInt(valueString);
 
-            if (valueString == "ace" && instance.points < 12) {
+            if (valueString == "ace" && instance.points > 12) {
                 value = 1;
             }
 
@@ -89,68 +115,80 @@ function App() {
         return totalPoints;
     };
 
-    const handleClick = (e) => {
-        if (e.target.name == "start") {
-            let tempPlayer = {
-                hand: getRandomHand(),
-                points: 0,
-            };
-            tempPlayer = {
-                ...tempPlayer,
-                points: getHandScore(tempPlayer),
-            };
-            setPlayer(tempPlayer);
-            console.log(tempPlayer);
-            let tempDealer = {
-                hand: getRandomHand(),
-                points: 0,
-            };
-            tempDealer = {
-                ...tempDealer,
-                points: getHandScore(tempDealer),
-            };
-            setDealer(tempDealer);
-            console.log(tempDealer);
-            let tempGameStatus = "";
-            if (tempPlayer.points == 21) {
-                tempGameStatus = "blackjack";
-            }
-            if (tempPlayer.points < 21) {
-                if (tempDealer.points == "21") {
-                    tempGameStatus = "lose";
-                } else {
-                    tempGameStatus = "onGoing";
-                }
-            }
-            setGameStatus(tempGameStatus);
+    const startNewGame = () => {
+        let tempPlayer = {
+            hand: getRandomHand(),
+            points: 0,
+        };
+        tempPlayer = {
+            ...tempPlayer,
+            points: getHandScore(tempPlayer),
+        };
+        setPlayer(tempPlayer);
+        console.log(tempPlayer);
+        let tempDealer = {
+            hand: getRandomHand(),
+            points: 0,
+        };
+        tempDealer = {
+            ...tempDealer,
+            points: getHandScore(tempDealer),
+        };
+        setDealer(tempDealer);
+        console.log(tempDealer);
+        let tempGameStatus = "";
+        if (tempPlayer.points == 21) {
+            tempGameStatus = "blackjack";
         }
-
-        if (e.target.name == "deal") {
-            let tempPlayer = player;
-            tempPlayer = getTemp(tempPlayer);
-            setPlayer(tempPlayer);
-            if (tempPlayer.points > 21) {
-                setGameStatus("bust");
-            }
-            if (tempPlayer.points == 21) {
-                let tempDealer = dealer;
-                while (tempDealer.points < 17) {
-                    tempDealer = getTemp(tempDealer);
-                }
-                setDealer(tempDealer);
-                compareHands(tempDealer.points, tempPlayer.points);
+        if (tempPlayer.points < 21) {
+            if (tempDealer.points == "21") {
+                tempGameStatus = "lose";
+            } else {
+                tempGameStatus = "onGoing";
             }
         }
+        setGameStatus(tempGameStatus);
+    };
 
-        if (e.target.name == "fold") {
-            console.log(dealer);
-            console.log(player);
+    const dealCard = () => {
+        let tempPlayer = player;
+        tempPlayer = getTemp(tempPlayer);
+        setPlayer(tempPlayer);
+        if (tempPlayer.points > 21) {
+            setGameStatus("bust");
+        }
+        if (tempPlayer.points == 21) {
             let tempDealer = dealer;
             while (tempDealer.points < 17) {
                 tempDealer = getTemp(tempDealer);
             }
             setDealer(tempDealer);
-            compareHands(tempDealer.points, player.points);
+            compareHands(tempDealer.points, tempPlayer.points);
+        }
+    };
+
+    const foldHand = () => {
+        console.log(dealer);
+        console.log(player);
+        let tempDealer = dealer;
+        while (tempDealer.points < 17) {
+            tempDealer = getTemp(tempDealer);
+        }
+        setDealer(tempDealer);
+        compareHands(tempDealer.points, player.points);
+    };
+
+    const handleClick = (e) => {
+        if (e.target.name == "start") {
+            startNewGame();
+        }
+
+        if (e.target.name == "deal") {
+            dealCard();
+        }
+
+        if (e.target.name == "fold") {
+            foldHand();
         }
     };
 
@@ -168,7 +206,10 @@ function App() {
         ));
         return (
             <>
-                <h2>Dealer&apos;s Cards {dealer.points}</h2>
+                <h2>
+                    Dealer&apos;s Cards{" "}
+                    {gameStatus != "onGoing" ? dealer.points : null}
+                </h2>
                 <h3>{dealerCardsElem}</h3>
                 <h2>Player&apos;s Cards {player.points} </h2>
                 <h3>{playerCardsElem}</h3>
