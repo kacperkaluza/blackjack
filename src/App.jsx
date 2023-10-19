@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./App.css";
 
 function App() {
     const [dealer, setDealer] = useState({ hand: [], points: 0 });
     const [player, setPlayer] = useState({ hand: [], points: 0 });
     const [gameStatus, setGameStatus] = useState("NaN");
-    const [deck, setDeck] = useState([]);
 
     const cards = {
         values: [
@@ -34,48 +33,51 @@ function App() {
             .flat();
     };
 
-    const shuffleDeck = (d) => {
-        let j, x;
-        for (let i = d.length - 1; i > 0; i--) {
-            j = getRandomNumber(i + 1);
-            x = d[i];
-            d[i] = d[j];
-            d[j] = x;
-        }
-        return d;
-    };
-    useEffect(() => {
-        setDeck(shuffleDeck(getDeck()));
-    }, []);
-    console.log(deck);
     const getRandomNumber = (max) => {
         return Math.floor(Math.random() * max);
     };
 
+    const shuffleDeck = (deck) => {
+        let randomIndex, tempValue;
+        for (let i = deck.length - 1; i > 0; i--) {
+            randomIndex = getRandomNumber(i + 1);
+            tempValue = deck[i];
+            deck[i] = deck[randomIndex];
+            deck[randomIndex] = tempValue;
+        }
+        return deck;
+    };
+
+    if (gameStatus == "NaN") var deck = shuffleDeck(getDeck());
+    console.log(deck);
+
     const getCard = () => {
-        const card = [...deck].pop();
-        setDeck(deck.filter((c) => c !== card));
+        const card = deck.pop();
+        deck = deck.filter((c) => c !== card);
         return card;
     };
 
     const getRandomHand = () => {
-        const cards = deck.slice(-2);
-        setDeck((prev) => prev.slice(0, -2));
+        let cards = deck.slice(-2);
+        console.log(cards);
+        console.log(deck);
+        deck = deck.slice(0, -2);
         return cards;
     };
 
     const compareHands = (a, b) => {
         if (a > 21) {
             setGameStatus("win");
-        }
-        if (b == a) {
-            setGameStatus("push");
-        }
-        if (b > a) {
-            setGameStatus("win");
-        }
-        if (b < a) {
-            setGameStatus("lose");
+        } else {
+            if (b == a) {
+                setGameStatus("push");
+            }
+            if (b > a) {
+                setGameStatus("win");
+            }
+            if (b < a) {
+                setGameStatus("lose");
+            }
         }
     };
 
@@ -125,7 +127,6 @@ function App() {
             points: getHandScore(tempPlayer),
         };
         setPlayer(tempPlayer);
-        console.log(tempPlayer);
         let tempDealer = {
             hand: getRandomHand(),
             points: 0,
@@ -135,7 +136,6 @@ function App() {
             points: getHandScore(tempDealer),
         };
         setDealer(tempDealer);
-        console.log(tempDealer);
         let tempGameStatus = "";
         if (tempPlayer.points == 21) {
             tempGameStatus = "blackjack";
@@ -147,7 +147,7 @@ function App() {
                 tempGameStatus = "onGoing";
             }
         }
-        setGameStatus(tempGameStatus);
+        return setGameStatus(tempGameStatus);
     };
 
     const dealCard = () => {
@@ -155,7 +155,7 @@ function App() {
         tempPlayer = getTemp(tempPlayer);
         setPlayer(tempPlayer);
         if (tempPlayer.points > 21) {
-            setGameStatus("bust");
+            return setGameStatus("bust");
         }
         if (tempPlayer.points == 21) {
             let tempDealer = dealer;
@@ -163,19 +163,17 @@ function App() {
                 tempDealer = getTemp(tempDealer);
             }
             setDealer(tempDealer);
-            compareHands(tempDealer.points, tempPlayer.points);
+            return compareHands(tempDealer.points, tempPlayer.points);
         }
     };
 
     const foldHand = () => {
-        console.log(dealer);
-        console.log(player);
         let tempDealer = dealer;
         while (tempDealer.points < 17) {
             tempDealer = getTemp(tempDealer);
         }
         setDealer(tempDealer);
-        compareHands(tempDealer.points, player.points);
+        return compareHands(tempDealer.points, player.points);
     };
 
     const handleClick = (e) => {
