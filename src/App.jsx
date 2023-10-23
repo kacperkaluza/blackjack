@@ -179,6 +179,9 @@ function App() {
 
     const handleClick = (e) => {
         if (e.target.name == "start") {
+            if (deck.length < 8) {
+                deck = shuffleDeck(getDeck());
+            }
             startNewGame();
         }
 
@@ -215,6 +218,7 @@ function App() {
             </>
         );
     }
+
     return (
         <>
             {gameStatus == "NaN" ? null : <DisplayCards />}
