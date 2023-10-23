@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./App.css";
+var deck;
 
 function App() {
     const [dealer, setDealer] = useState({ hand: [], points: 0 });
@@ -48,7 +49,7 @@ function App() {
         return deck;
     };
 
-    if (gameStatus == "NaN") var deck = shuffleDeck(getDeck());
+    if (gameStatus == "NaN") deck = shuffleDeck(getDeck());
     console.log(deck);
 
     const getCard = () => {
