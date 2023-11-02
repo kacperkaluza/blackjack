@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 export default function Display({ dealer, player, gameStatus }) {
   const dealerCardsElem = dealer.hand.map((card, key) => (
     <img

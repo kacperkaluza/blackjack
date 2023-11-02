@@ -40,7 +40,7 @@ const shuffleDeck = (deck) => {
   }
   return deck;
 };
-var deck = shuffleDeck(getDeck());
+var deck = [];
 
 function App() {
   const [dealer, setDealer] = useState({ hand: [], points: 0 });
