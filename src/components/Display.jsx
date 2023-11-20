@@ -1,7 +1,7 @@
 import Buttons from "./Buttons";
 
 /* eslint-disable react/prop-types */
-export default function Display({ dealer, player, gameStatus }) {
+export default function Display() {
   const dealerCardsElem = dealer.hand.map((card, key) => (
     <img
       src={`cards/${
