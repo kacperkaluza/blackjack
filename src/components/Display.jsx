@@ -1,7 +1,14 @@
+import { useDealer } from "../hooks/useDealer";
+import { useGameStatus } from "../hooks/useGameStatus";
+import { usePlayer } from "../hooks/usePlayer";
 import Buttons from "./Buttons";
 
 /* eslint-disable react/prop-types */
 export default function Display() {
+  const [dealer, changeDealer] = useDealer();
+  const [player, changePlayer] = usePlayer();
+  const [gameStatus, changeGameStatus] = useGameStatus();
+  
   const dealerCardsElem = dealer.hand.map((card, key) => (
     <img
       src={`cards/${
