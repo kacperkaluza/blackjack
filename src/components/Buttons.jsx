@@ -5,8 +5,9 @@ import Start from "./Buttons/Start";
 export default function Buttons() {
   return (
     <>
-      <Start />
-      <Deal />
+      {gameStatus != "onGoing" && <Start />}
+      {gameStatus == "onGoing" && <Deal />}
+      {gameStatus == "onGoing" && <Fold />}
       <Fold />
     </>
   );
