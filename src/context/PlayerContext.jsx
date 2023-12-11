@@ -6,12 +6,10 @@ export const PlayerContext = createContext([{ hand: [], points: 0 }, () => {}]);
 export const PlayerProvider = ({ children }) => {
   const [player, setPlayer] = useState({ hand: [], points: 0 });
 
-  const changePlayer = (p) => {
-    setPlayer(p);
-  };
+  
 
   return (
-    <DealerContext.Provider value={[player, changePlayer]}>
+    <DealerContext.Provider value={[player, setPlayer]}>
       {children}
     </DealerContext.Provider>
   );

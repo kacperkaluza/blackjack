@@ -1,6 +1,4 @@
-import { useState } from "react";
 import "./App.css";
-import Display from "./components/Display";
 import { DealerProvider } from "./context/DealerContext";
 import { useDealer } from "./hooks/useDealer";
 import { usePlayer } from "./hooks/usePlayer";
@@ -9,6 +7,7 @@ import { useGameStatus } from "./hooks/useGameStatus";
 import { DeckProvider } from "./context/DeckContext";
 import { PlayerProvider } from "./context/PlayerContext";
 import { GameStatusProvider } from "./context/GameStatusContext";
+import Game from "./components/Game";
 
 var deck = [];
 
@@ -23,7 +22,7 @@ function App() {
         <PlayerProvider>
           <GameStatusProvider>
             {gameStatus == "NaN" ? null : (
-              <Display
+              <Game
                 dealer={dealer}
                 player={player}
                 gameStatus={gameStatus}

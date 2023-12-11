@@ -4,7 +4,7 @@ import { usePlayer } from "../hooks/usePlayer";
 import Buttons from "./Buttons";
 
 /* eslint-disable react/prop-types */
-export default function Display() {
+export default function Game() {
   const [dealer, changeDealer] = useDealer();
   const [player, changePlayer] = usePlayer();
   const [gameStatus, changeGameStatus] = useGameStatus();
