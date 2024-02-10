@@ -1,4 +1,4 @@
-export const getRandomHand = () => {
+export const getRandomHand = (deck) => {
   let cards = deck.slice(-2);
   console.log(cards);
   console.log(deck);

@@ -1,13 +1,13 @@
-import { useDealer } from "../hooks/useDealer";
-import { useGameStatus } from "../hooks/useGameStatus";
-import { usePlayer } from "../hooks/usePlayer";
+import { useContext } from "react";
 import Buttons from "./Buttons";
+import GameStatusContext from "../context/GameStatusContext";
+import PlayerContext from "../context/PlayerContext";
+import DealerContext from "../context/DealerContext";
 
-/* eslint-disable react/prop-types */
 export default function Game() {
-  const [dealer, changeDealer] = useDealer();
-  const [player, changePlayer] = usePlayer();
-  const [gameStatus, changeGameStatus] = useGameStatus();
+  const gameStatus = useContext(GameStatusContext);
+  const player = useContext(PlayerContext);
+  const dealer = useContext(DealerContext);
   
   const dealerCardsElem = dealer.hand.map((card, key) => (
     <img

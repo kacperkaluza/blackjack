@@ -1,15 +1,15 @@
 export const compareHands = (a, b) => {
-    if (a > 21) {
-      return setGameStatus("win");
-    } else {
-      if (b == a) {
-        return setGameStatus("push");
-      }
-      if (b > a) {
-        return setGameStatus("win");
-      }
-      if (b < a) {
-        return setGameStatus("lose");
-      }
-    }
-  };
+  if (a > 21) {
+		return "win";
+	} else {
+		if (b == a) {
+			return "push";
+		}
+		if (b > a) {
+			return "win";
+		}
+		if (b < a) {
+			return "lose";
+		}
+	}
+};
