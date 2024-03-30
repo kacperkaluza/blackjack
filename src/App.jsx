@@ -1,28 +1,8 @@
 import { useState } from "react";
 import "./App.css";
 import Display from "../components/Display";
-
-const getRandomNumber = (max) => {
-	return Math.floor(Math.random() * max);
-};
-const cards = {
-	values: [
-		"ace",
-		"2",
-		"3",
-		"4",
-		"5",
-		"6",
-		"7",
-		"8",
-		"9",
-		"10",
-		"jack",
-		"queen",
-		"king",
-	],
-	symbols: ["clubs", "diamonds", "hearts", "spades"],
-};
+import { cards } from "../data/cards";
+import getRandomNumber from "../utils/getRandomNumber";
 
 const getDeck = () => {
 	return cards.values
@@ -90,6 +70,7 @@ function App() {
 	};
 
 	const getHandScore = (instance) => {
+		
 		const cardValues = {
 			jack: 10,
 			queen: 10,
@@ -109,7 +90,6 @@ function App() {
 
 			totalPoints += value;
 		}
-
 		return totalPoints;
 	};
 
@@ -190,28 +170,28 @@ function App() {
 	};
 	return (
 		<>
-			{gameStatus == "NaN" ? null : (
+			{gameStatus != "NaN" && (
 				<Display
 					dealer={dealer}
 					player={player}
 					gameStatus={gameStatus}
 				/>
 			)}
-			{gameStatus != "onGoing" ? (
+			{gameStatus != "onGoing" && (
 				<button onClick={handleClick} name="start">
 					New Game
 				</button>
-			) : null}
-			{gameStatus == "onGoing" ? (
+			)}
+			{gameStatus == "onGoing" && (
 				<button onClick={handleClick} name="deal">
 					Deal
 				</button>
-			) : null}
-			{gameStatus == "onGoing" ? (
+			)}
+			{gameStatus == "onGoing" && (
 				<button onClick={handleClick} name="fold">
 					Fold
 				</button>
-			) : null}
+			)}
 			<h2>{gameStatus}</h2>
 		</>
 	);
