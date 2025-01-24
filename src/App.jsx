@@ -23,20 +23,18 @@ const shuffleDeck = (deck) => {
 var deck = [];
 
 function App() {
-	const [dealer, setDealer] = useState({ hand: [], points: 0 });
-	const [player, setPlayer] = useState({ hand: [], points: 0 });
+	const [dealer, setDealer] = useState({ hand: [''], points: 0 });
+	const [player, setPlayer] = useState({ hand: [''], points: 0 });
 	const [gameStatus, setGameStatus] = useState("NaN");
 
 	const getCard = () => {
 		const card = deck.pop();
-		deck = deck.filter((c) => c !== card);
+		// deck = deck.filter((c) => c !== card);
 		return card;
 	};
 
 	const getRandomHand = () => {
 		let cards = deck.slice(-2);
-		console.log(cards);
-		console.log(deck);
 		deck = deck.slice(0, -2);
 		return cards;
 	};
@@ -77,6 +75,7 @@ function App() {
 			king: 10,
 			ace: 11,
 		};
+		
 		let totalPoints = 0;
 
 		for (let i = 0; i < instance.hand.length; i++) {
